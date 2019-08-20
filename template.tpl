@@ -443,7 +443,10 @@ ___SANDBOXED_JS_FOR_WEB_TEMPLATE___
 const log = require('logToConsole'),
     query = require('queryPermission'),
     random = require('generateRandom'),
-    encodeUriComponent = require('encodeUriComponent'),
+    _encodeUriComponent = require('encodeUriComponent'),
+    encodeUriComponent = function(val) {
+        return _encodeUriComponent(val.toString());
+    },
     getTimestamp = require('getTimestamp'),
     callInWindow = require('callInWindow'),
     getQueryParameters = require('getQueryParameters'),
@@ -452,7 +455,7 @@ const log = require('logToConsole'),
     setCookie = require('setCookie'),
     sendPixel = require('sendPixel');
 
-log('LQM conversion tracking pixel v1.07');
+log('LQM conversion tracking pixel v1.08');
 let msg = 'data: ';
 for (let i in data) msg += '\n' + i + ': ' + data[i];
 log(msg);
@@ -484,18 +487,18 @@ if (data.consentType === 'none') {
 function execute(gdpr, consent) {
     if (data.attributionType === 'account') {
         if (data.accountID && data.conversionID) {
-            firePixel('https://tracking.lqm.io/conversion_event/account/' + data.accountID + '/t.gif?' +
-                'conversion_id=' + data.conversionID +
-                '&gdpr=' + gdpr + '&gdpr_consent=' + encodeUriComponent(consent) + '&cb=' + getTimestamp());
+            firePixel('https://tracking.lqm.io/conversion_event/account/' + encodeUriComponent(data.accountID) + '/t.gif?' +
+                'conversion_id=' + encodeUriComponent(data.conversionID) +
+                '&gdpr=' + encodeUriComponent(gdpr) + '&gdpr_consent=' + encodeUriComponent(consent) + '&cb=' + getTimestamp());
         } else {
             log('missing account or conversion ID');
             data.gtmOnFailure();
         }
     } else if (data.attributionType === 'campaign') {
         if (data.campaignID && data.conversionID) {
-            firePixel('https://tracking.lqm.io/conversion_event/campaign/' + data.campaignID + '/t.gif?' +
-                'conversion_id=' + data.conversionID +
-                '&gdpr=' + gdpr + '&gdpr_consent=' + encodeUriComponent(consent) + '&cb=' + getTimestamp());
+            firePixel('https://tracking.lqm.io/conversion_event/campaign/' + encodeUriComponent(data.campaignID) + '/t.gif?' +
+                'conversion_id=' + encodeUriComponent(data.conversionID) +
+                '&gdpr=' + encodeUriComponent(gdpr) + '&gdpr_consent=' + encodeUriComponent(consent) + '&cb=' + getTimestamp());
         } else {
             log('missing campaign or conversion ID');
             data.gtmOnFailure();
@@ -508,9 +511,9 @@ function execute(gdpr, consent) {
         let token = readToken();
         if (token) {
             writeToken(token);
-            firePixel('https://tracking.lqm.io/conversion/' + token + '/t.gif?' +
-                'conversion_id=' + data.conversionID +
-                '&gdpr=' + gdpr + '&gdpr_consent=' + encodeUriComponent(consent) + '&cb=' + getTimestamp());
+            firePixel('https://tracking.lqm.io/conversion/' + encodeUriComponent(token) + '/t.gif?' +
+                'conversion_id=' + encodeUriComponent(data.conversionID) +
+                '&gdpr=' + encodeUriComponent(gdpr) + '&gdpr_consent=' + encodeUriComponent(consent) + '&cb=' + getTimestamp());
         } else {
             log('token is not found');
             data.gtmOnFailure();
